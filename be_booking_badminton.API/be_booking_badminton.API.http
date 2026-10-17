@@ -1,0 +1,13 @@
+@be_booking_badminton.API_HostAddress = http://localhost:5095
+
+GET {{be_booking_badminton.API_HostAddress}}/api/health
+Accept: application/json
+
+###
+
+POST {{be_booking_badminton.API_HostAddress}}/api/sample/echo
+Content-Type: application/json
+
+{
+  "message": "Hello Clean Architecture"
+}
