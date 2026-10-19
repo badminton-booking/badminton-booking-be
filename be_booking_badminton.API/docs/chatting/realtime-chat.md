@@ -484,3 +484,4 @@ Khi kết bạn được chấp nhận, hai client tải snapshot mới. Khi h�
 6. Kiểm thử nhóm: lời mời người lạ và chấp nhận; mời lặp đồng thời; gửi nhiều tin đồng thời; member mới không thấy lịch sử cũ; member bị xóa không đọc/gửi/nhận event mới; chuyển owner trước khi rời; giải tán; thu hồi tin nhóm; reconnect và đồng bộ sequence; người cùng nhóm chưa là bạn không thấy online.
 
 Tài liệu này mô tả contract để triển khai. Chưa có migration hoặc code chat được tạo cùng file này.
+
