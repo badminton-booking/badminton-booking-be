@@ -2,14 +2,37 @@ using System.Linq.Expressions;
 using be_booking_badminton.Application.Abstractions.Persistence;
 using be_booking_badminton.Domain.Common;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace be_booking_badminton.Infrastructure.Persistence;
 
 public sealed class AppDbContext : DbContext, IUnitOfWork
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options)
-        : base(options)
+    private readonly IConfiguration? _configuration;
+
+    public AppDbContext(
+        DbContextOptions<AppDbContext>? options = null,
+        IConfiguration? configuration = null)
+        : base(options ?? new DbContextOptions<AppDbContext>())
     {
+        _configuration = configuration;
+    }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        if (optionsBuilder.IsConfigured)
+        {
+            return;
+        }
+
+        var connectionString = _configuration?.GetConnectionString("DefaultConnection");
+        if (string.IsNullOrWhiteSpace(connectionString))
+        {
+            throw new InvalidOperationException(
+                "ConnectionStrings:DefaultConnection is required to configure AppDbContext.");
+        }
+
+        optionsBuilder.UseNpgsql(connectionString);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
