@@ -16,12 +16,12 @@
 | Thuật ngữ | Nghĩa |
 |---|---|
 | User hợp lệ | `users.status = 'ACTIVE'`, `users.is_deleted = false`, có ít nhất một role `CUSTOMER` hoặc `OWNER` đang hoạt động. Kiểm tra từ database ở thao tác nhạy cảm, không chỉ tin claim role cũ trong JWT. |
-| Người lạ | Hai User chưa có quan hệ bạn bè `ACCEPTED`. Người lạ vẫn được bắt đầu chat riêng hoặc mời vào nhóm. |
+| Người lạ | Hai User chưa có quan hệ bạn bè `accepted`. Người lạ vẫn được bắt đầu chat riêng hoặc mời vào nhóm. |
 | Thành viên nhóm | User có `GroupMember.IsDeleted = false` trong group chưa giải tán; tư cách này cấp quyền chat nhóm nhưng không cấp quyền xem presence. |
-| Bạn bè | Một cặp User có `friendships.status = 'ACCEPTED'`. Quan hệ không phụ thuộc vào việc đã chat hay chưa. |
+| Bạn bè | Một cặp User có `friendships.status = 'accepted'`. Quan hệ không phụ thuộc vào việc đã chat hay chưa. |
 | Đang kết nối | User có ít nhất một kết nối SignalR còn hoạt động, kể cả khi họ chọn ẩn trạng thái. Đây là trạng thái tạm thời do server xác định. |
-| Hiển thị online | Tùy chọn bền vững do chính User đặt: `VISIBLE` (mặc định) hoặc `HIDDEN`. `HIDDEN` cho phép tiếp tục chat nhưng xuất hiện offline với người khác. |
-| Online công khai | User hợp lệ **đang kết nối** và chọn `VISIBLE`. Chỉ bạn bè không bị chặn được xem; không thể tự chọn online khi không có kết nối. Trạng thái gần thời gian thực, không bảo đảm chính xác tức thời khi mạng mất đột ngột. |
+| Hiển thị online | Tùy chọn bền vững do chính User đặt: `visible` (mặc định) hoặc `hidden`. `hidden` cho phép tiếp tục chat nhưng xuất hiện offline với người khác. |
+| Online công khai | User hợp lệ **đang kết nối** và chọn `visible`. Chỉ bạn bè không bị chặn được xem; không thể tự chọn online khi không có kết nối. Trạng thái gần thời gian thực, không bảo đảm chính xác tức thời khi mạng mất đột ngột. |
 | Thu hồi | Người gửi làm nội dung tin nhắn không còn hiển thị cho cả hai phía. Record và ID được giữ để đồng bộ thứ tự, nội dung được xóa khỏi field `Content`. |
 | Chặn | Một User ngăn User kia gửi tin mới, gửi lời mời kết bạn và xem online của mình. Hai phía vẫn được xem lịch sử chat cũ của chính họ. |
 
@@ -167,8 +167,8 @@ erDiagram
 | `Id` | `uuid` | No | PK, `gen_random_uuid()` |
 | `RequesterUserId` | `uuid` | No | FK → `users.id`; người gửi lời mời gần nhất |
 | `RecipientUserId` | `uuid` | No | FK → `users.id`; người nhận lời mời gần nhất |
-| `Status` | `varchar(20)` | No | `PENDING`, `ACCEPTED`, `REJECTED`, `CANCELLED` |
-| `RespondedAt` | `timestamptz` | Yes | Thời điểm xử lý lời mời; `NULL` khi `PENDING` |
+| `Status` | `varchar(20)` | No | `pending`, `accepted`, `rejected`, `cancelled` |
+| `RespondedAt` | `timestamptz` | Yes | Thời điểm xử lý lời mời; `NULL` khi `pending` |
 | `LastActivityAt` | `timestamptz` | No | Default `now()`; cập nhật khi gửi lại hoặc đổi trạng thái, dùng sắp xếp danh sách |
 | `CreatedAt` | `timestamptz` | No | Default `now()` |
 | `UpdatedAt` | `timestamptz` | Yes | Cập nhật khi đổi trạng thái hoặc gửi lại |
@@ -177,19 +177,19 @@ erDiagram
 **Constraints/indexes**
 
 - `CHECK (RequesterUserId <> RecipientUserId)`; không thể tự kết bạn. Unique **expression index** trên `(LEAST(RequesterUserId, RecipientUserId), GREATEST(RequesterUserId, RecipientUserId))` bảo đảm một row cho cặp bất kể ai gửi lời mời. Index áp dụng cả row `IsDeleted = true` để lúc mời lại phải restore row cũ.
-- `PENDING` yêu cầu `RespondedAt IS NULL`; các trạng thái còn lại yêu cầu `RespondedAt IS NOT NULL`.
+- `pending` yêu cầu `RespondedAt IS NULL`; các trạng thái còn lại yêu cầu `RespondedAt IS NOT NULL`.
 - Index `(RequesterUserId, Status, LastActivityAt DESC, Id DESC)` và `(RecipientUserId, Status, LastActivityAt DESC, Id DESC)` với `IsDeleted = false` phục vụ danh sách bạn bè và lời mời đã gửi/đã nhận.
 
 **Chuyển trạng thái**
 
 | Từ | Hành động | Sang | Người được thực hiện |
 |---|---|---|---|
-| Chưa có row, `REJECTED`, `CANCELLED`, hoặc row đã soft-delete | Gửi lời mời | `PENDING` | Người gửi mới; đặt lại `RequesterUserId`, `RecipientUserId`, `RespondedAt = NULL`, `IsDeleted = false` |
-| `PENDING` | Chấp nhận / từ chối | `ACCEPTED` / `REJECTED` | Chỉ người **nhận** lời mời |
-| `PENDING` | Hủy lời mời | `CANCELLED` | Chỉ người **gửi** |
-| `ACCEPTED` | Hủy kết bạn | `IsDeleted = true` | Một trong hai User; giữ `Status = ACCEPTED` để biết trạng thái trước khi xóa |
+| Chưa có row, `rejected`, `cancelled`, hoặc row đã soft-delete | Gửi lời mời | `pending` | Người gửi mới; đặt lại `RequesterUserId`, `RecipientUserId`, `RespondedAt = NULL`, `IsDeleted = false` |
+| `pending` | Chấp nhận / từ chối | `accepted` / `rejected` | Chỉ người **nhận** lời mời |
+| `pending` | Hủy lời mời | `cancelled` | Chỉ người **gửi** |
+| `accepted` | Hủy kết bạn | `IsDeleted = true` | Một trong hai User; giữ `Status = accepted` để biết trạng thái trước khi xóa |
 
-Không tạo row thứ hai khi tái gửi; tìm cả row soft-delete, cập nhật row cũ trong transaction. Mọi chuyển trạng thái cập nhật `LastActivityAt` và `UpdatedAt`; khi rời `PENDING` thì đặt `RespondedAt`, khi mời lại thì xóa `RespondedAt`. Với request đồng thời, unique pair và kiểm tra trạng thái sau xung đột bảo đảm chỉ một lời mời đang chờ. Không cho gửi lại khi `PENDING` hoặc `ACCEPTED` còn hiệu lực. Bộ lọc trạng thái chỉ phản ánh **trạng thái hiện tại** của row chưa soft-delete, không phải lịch sử mọi lần mời.
+Không tạo row thứ hai khi tái gửi; tìm cả row soft-delete, cập nhật row cũ trong transaction. Mọi chuyển trạng thái cập nhật `LastActivityAt` và `UpdatedAt`; khi rời `pending` thì đặt `RespondedAt`, khi mời lại thì xóa `RespondedAt`. Với request đồng thời, unique pair và kiểm tra trạng thái sau xung đột bảo đảm chỉ một lời mời đang chờ. Không cho gửi lại khi `pending` hoặc `accepted` còn hiệu lực. Bộ lọc trạng thái chỉ phản ánh **trạng thái hiện tại** của row chưa soft-delete, không phải lịch sử mọi lần mời.
 
 ### 3.4. `user_blocks` — chặn liên hệ
 
@@ -204,7 +204,7 @@ Không tạo row thứ hai khi tái gửi; tìm cả row soft-delete, cập nh�
 
 - `CHECK (BlockerUserId <> BlockedUserId)`; `UNIQUE (BlockerUserId, BlockedUserId)` để bỏ chặn rồi chặn lại bằng cách restore record cũ.
 - Index `(BlockedUserId, BlockerUserId) WHERE IsDeleted = false` để kiểm tra chiều ngược. Unique pair đã phục vụ chiều thuận.
-- Nếu một trong hai chiều có block đang hoạt động: từ chối gửi tin riêng mới, gửi/chấp nhận lời mời kết bạn và gửi lời mời nhóm mới giữa hai User; không công bố presence giữa hai User. Khi block, lời mời kết bạn `PENDING` giữa họ chuyển `CANCELLED` trong cùng transaction. Quan hệ bạn bè `ACCEPTED` được soft-delete (`IsDeleted = true`). Lời mời nhóm pending do blocker gửi tới blocked hoặc ngược lại cũng chuyển `CANCELLED`; membership nhóm hiện có không đổi.
+- Nếu một trong hai chiều có block đang hoạt động: từ chối gửi tin riêng mới, gửi/chấp nhận lời mời kết bạn và gửi lời mời nhóm mới giữa hai User; không công bố presence giữa hai User. Khi block, lời mời kết bạn `pending` giữa họ chuyển `cancelled` trong cùng transaction. Quan hệ bạn bè `accepted` được soft-delete (`IsDeleted = true`). Lời mời nhóm pending do blocker gửi tới blocked hoặc ngược lại cũng chuyển `cancelled`; membership nhóm hiện có không đổi.
 - Một thao tác gửi đã bắt đầu trước khi transaction block commit có thể hoàn tất; block áp dụng cho thao tác bắt đầu sau khi commit. Client phải bỏ qua sự kiện presence cũ sau khi biết trạng thái block.
 
 ### 3.5. `user_presence_settings` — quyền hiển thị trạng thái
@@ -213,14 +213,14 @@ Không tạo row thứ hai khi tái gửi; tìm cả row soft-delete, cập nh�
 |---|---|---:|---|
 | `Id` | `uuid` | No | PK, `gen_random_uuid()` |
 | `UserId` | `uuid` | No | FK → `users.id`, UNIQUE; chủ cài đặt |
-| `Visibility` | `varchar(20)` | No | `VISIBLE` hoặc `HIDDEN`; mặc định `VISIBLE` |
+| `Visibility` | `varchar(20)` | No | `visible` hoặc `hidden`; mặc định `visible` |
 | `CreatedAt` | `timestamptz` | No | Default `now()` |
 | `UpdatedAt` | `timestamptz` | Yes | Thời điểm đổi tùy chọn |
 | `IsDeleted` | `boolean` | No | Default `false`; không có API xóa ở bản đầu |
 
-- `CHECK (Visibility IN ('VISIBLE', 'HIDDEN'))`; `UNIQUE (UserId)` kể cả row soft-delete. Nếu chưa có row thì coi là `VISIBLE`; tạo row khi User đổi cài đặt lần đầu.
-- Không lưu `IsOnline` trong PostgreSQL. Trạng thái online công khai = User hợp lệ + `Visibility = VISIBLE` + số kết nối SignalR còn sống > 0. `HIDDEN` chỉ thay đổi cách người khác nhìn thấy User; Hub, gửi/nhận tin và thông báo vẫn hoạt động.
-- `User.Status` (`ACTIVE`/`SUSPENDED`...) là trạng thái tài khoản, độc lập với presence và không được dùng thay cho tùy chọn này. Không cung cấp `LastSeenAt` ở bản đầu để tránh vô tình tiết lộ hoạt động khi User chọn `HIDDEN`.
+- `CHECK (Visibility IN ('visible', 'hidden'))`; `UNIQUE (UserId)` kể cả row soft-delete. Nếu chưa có row thì coi là `visible`; tạo row khi User đổi cài đặt lần đầu.
+- Không lưu `IsOnline` trong PostgreSQL. Trạng thái online công khai = User hợp lệ + `Visibility = visible` + số kết nối SignalR còn sống > 0. `hidden` chỉ thay đổi cách người khác nhìn thấy User; Hub, gửi/nhận tin và thông báo vẫn hoạt động.
+- `User.Status` (`ACTIVE`/`SUSPENDED`...) là trạng thái tài khoản, độc lập với presence và không được dùng thay cho tùy chọn này. Không cung cấp `LastSeenAt` ở bản đầu để tránh vô tình tiết lộ hoạt động khi User chọn `hidden`.
 
 ### 3.6. `direct_conversations` — một cuộc chat cho một cặp
 
@@ -298,7 +298,7 @@ Nhóm là aggregate độc lập với chat riêng. Không ghép cặp User vào
 | `UpdatedAt` | `timestamptz` | Yes | Khi đổi tên/owner hoặc có tin |
 | `IsDeleted` | `boolean` | No | Default `false`; chỉ owner được giải tán nhóm |
 
-`CHECK (LastMessageSequence >= 0)`; `CHECK (length(btrim(Name)) BETWEEN 1 AND 100)`. Owner phải là member `OWNER` chưa soft-delete; tạo group và member owner cùng transaction. Khi chuyển quyền, cập nhật owner cũ, owner mới và `OwnerUserId` cùng transaction. Giải tán nhóm đóng quyền gửi/đọc bằng API thông thường; không xóa vật lý dữ liệu. Index `(OwnerUserId)` phục vụ quản trị.
+`CHECK (LastMessageSequence >= 0)`; `CHECK (length(btrim(Name)) BETWEEN 1 AND 100)`. Owner phải là member `owner` chưa soft-delete; tạo group và member owner cùng transaction. Khi chuyển quyền, cập nhật owner cũ, owner mới và `OwnerUserId` cùng transaction. Giải tán nhóm đóng quyền gửi/đọc bằng API thông thường; không xóa vật lý dữ liệu. Index `(OwnerUserId)` phục vụ quản trị.
 
 **`group_members`**
 
@@ -307,13 +307,13 @@ Nhóm là aggregate độc lập với chat riêng. Không ghép cặp User vào
 | `Id` | `uuid` | No | PK |
 | `GroupConversationId` | `uuid` | No | FK → `group_conversations.id` |
 | `UserId` | `uuid` | No | FK → `users.id` |
-| `Role` | `varchar(20)` | No | `OWNER` hoặc `MEMBER` |
+| `Role` | `varchar(20)` | No | `owner` hoặc `member` |
 | `JoinedSequence` | `bigint` | No | Sequence đầu tiên được đọc; lúc nhận lời mời = `LastMessageSequence + 1` |
 | `CreatedAt` | `timestamptz` | No | Default `now()` |
 | `UpdatedAt` | `timestamptz` | Yes | Khi đổi role hoặc rời/vào lại |
 | `IsDeleted` | `boolean` | No | Default `false`; rời/bị xóa |
 
-`UNIQUE (GroupConversationId, UserId)` áp dụng cả row đã xóa để tái tham gia bằng restore; `CHECK (JoinedSequence >= 1)`; `CHECK (Role IN ('OWNER', 'MEMBER'))`. Index `(UserId, IsDeleted, GroupConversationId)` cho inbox nhóm và `(GroupConversationId, IsDeleted, UserId)` cho danh sách thành viên. Chủ nhóm không thể rời/bị xóa khi chưa chuyển quyền hoặc giải tán. Khi tái tham gia, đặt lại `JoinedSequence`; không cấp lại lịch sử cũ.
+`UNIQUE (GroupConversationId, UserId)` áp dụng cả row đã xóa để tái tham gia bằng restore; `CHECK (JoinedSequence >= 1)`; `CHECK (Role IN ('owner', 'member'))`. Index `(UserId, IsDeleted, GroupConversationId)` cho inbox nhóm và `(GroupConversationId, IsDeleted, UserId)` cho danh sách thành viên. Chủ nhóm không thể rời/bị xóa khi chưa chuyển quyền hoặc giải tán. Khi tái tham gia, đặt lại `JoinedSequence`; không cấp lại lịch sử cũ.
 
 **`group_invitations`**
 
@@ -323,13 +323,13 @@ Nhóm là aggregate độc lập với chat riêng. Không ghép cặp User vào
 | `GroupConversationId` | `uuid` | No | FK → group |
 | `InviterUserId` | `uuid` | No | FK → `users.id`; member gửi mời |
 | `InviteeUserId` | `uuid` | No | FK → `users.id`; người được mời |
-| `Status` | `varchar(20)` | No | `PENDING`, `ACCEPTED`, `REJECTED`, `CANCELLED` |
+| `Status` | `varchar(20)` | No | `pending`, `accepted`, `rejected`, `cancelled` |
 | `RespondedAt` | `timestamptz` | Yes | `NULL` khi pending |
 | `CreatedAt` | `timestamptz` | No | Default `now()` |
 | `UpdatedAt` | `timestamptz` | Yes | Khi xử lý hoặc mời lại |
 | `IsDeleted` | `boolean` | No | Default `false`; không có API xóa ở bản đầu |
 
-`UNIQUE (GroupConversationId, InviteeUserId)` kể cả row đã xóa; mời lại chỉ cập nhật row cũ. `PENDING` yêu cầu `RespondedAt IS NULL`, trạng thái khác yêu cầu giá trị. Index `(InviteeUserId, Status, CreatedAt DESC, Id DESC)` phục vụ inbox lời mời. Chỉ member hiện hành mời được; nếu một chiều block giữa người mời và người nhận thì từ chối. Chỉ invitee chấp nhận/từ chối; người mời hoặc owner có thể hủy. Khi chấp nhận, khóa invitation và group, kiểm tra trạng thái, tạo/restore member với `JoinedSequence = LastMessageSequence + 1`, rồi chuyển `ACCEPTED` trong cùng transaction. Nếu invitee đã là member, trả `409`. Khi giải tán nhóm, hủy các lời mời pending trong cùng transaction; lời mời của nhóm đã giải tán không thể được chấp nhận.
+`UNIQUE (GroupConversationId, InviteeUserId)` kể cả row đã xóa; mời lại chỉ cập nhật row cũ. `pending` yêu cầu `RespondedAt IS NULL`, trạng thái khác yêu cầu giá trị. Index `(InviteeUserId, Status, CreatedAt DESC, Id DESC)` phục vụ inbox lời mời. Chỉ member hiện hành mời được; nếu một chiều block giữa người mời và người nhận thì từ chối. Chỉ invitee chấp nhận/từ chối; người mời hoặc owner có thể hủy. Khi chấp nhận, khóa invitation và group, kiểm tra trạng thái, tạo/restore member với `JoinedSequence = LastMessageSequence + 1`, rồi chuyển `accepted` trong cùng transaction. Nếu invitee đã là member, trả `409`. Khi giải tán nhóm, hủy các lời mời pending trong cùng transaction; lời mời của nhóm đã giải tán không thể được chấp nhận.
 
 **`group_messages`**
 
@@ -355,14 +355,14 @@ Tất cả route dưới đây yêu cầu JWT của User hợp lệ. `currentUse
 | Method | Route | Request / response chính |
 |---|---|---|
 | `POST` | `/api/friendships/requests` | `{ targetUserId }` → friendship; `409` nếu đang pending/accepted; `403` nếu bị chặn |
-| `GET` | `/api/friendships?pageIndex=1&pageSize=20&search=` | Danh sách bạn bè `ACCEPTED`; `search` tùy chọn lọc theo username/full name công khai; gồm `isOnline` hiện tại |
+| `GET` | `/api/friendships?pageIndex=1&pageSize=20&search=` | Danh sách bạn bè `accepted`; `search` tùy chọn lọc theo username/full name công khai; gồm `isOnline` hiện tại |
 | `GET` | `/api/presence/me` | `{ visibility, isConnected }`; chỉ chính User xem kết nối thật của mình |
-| `PATCH` | `/api/presence/me` | `{ visibility: "VISIBLE" | "HIDDEN" }` → cài đặt mới và `isOnline` công khai; idempotent |
-| `GET` | `/api/friendships/requests?pageIndex=1&pageSize=20&direction=received&status=PENDING` | Lời mời của User; `direction` là `received` (mặc định) hoặc `sent`; `status` mặc định `PENDING`, có thể lọc một trạng thái hiện tại khác |
-| `POST` | `/api/friendships/requests/{id}/accept` | Chỉ người nhận; chuyển `ACCEPTED` |
-| `POST` | `/api/friendships/requests/{id}/reject` | Chỉ người nhận; chuyển `REJECTED` |
-| `POST` | `/api/friendships/requests/{id}/cancel` | Chỉ người gửi; chuyển `CANCELLED` |
-| `DELETE` | `/api/friendships/{id}` | Một trong hai người; soft-delete quan hệ `ACCEPTED` bằng `IsDeleted = true` |
+| `PATCH` | `/api/presence/me` | `{ visibility: "visible" | "hidden" }` → cài đặt mới và `isOnline` công khai; idempotent |
+| `GET` | `/api/friendships/requests?pageIndex=1&pageSize=20&direction=received&status=pending` | Lời mời của User; `direction` là `received` (mặc định) hoặc `sent`; `status` mặc định `pending`, có thể lọc một trạng thái hiện tại khác |
+| `POST` | `/api/friendships/requests/{id}/accept` | Chỉ người nhận; chuyển `accepted` |
+| `POST` | `/api/friendships/requests/{id}/reject` | Chỉ người nhận; chuyển `rejected` |
+| `POST` | `/api/friendships/requests/{id}/cancel` | Chỉ người gửi; chuyển `cancelled` |
+| `DELETE` | `/api/friendships/{id}` | Một trong hai người; soft-delete quan hệ `accepted` bằng `IsDeleted = true` |
 | `PUT` | `/api/users/{targetUserId}/block` | Chặn hoặc trả trạng thái đã chặn; idempotent |
 | `DELETE` | `/api/users/{targetUserId}/block` | Bỏ chặn; idempotent |
 | `GET` | `/api/conversations?pageIndex=1&pageSize=20&otherUserId=` | Inbox của chính User, mới nhất trước; `otherUserId` tùy chọn lọc một đối phương; gồm profile, `lastMessageAt`, `lastMessageSequence`, preview tin cuối và `isOnline` **chỉ nếu là bạn bè** |
@@ -376,7 +376,7 @@ Tất cả route dưới đây yêu cầu JWT của User hợp lệ. `currentUse
 | `DELETE` | `/api/groups/{id}` | Owner giải tán group, soft-delete group |
 | `GET` | `/api/groups/{id}/members?pageIndex=1&pageSize=20&search=` | Member hiện hành; chỉ member đọc; online của từng người chỉ hiện nếu là bạn bè |
 | `POST` | `/api/groups/{id}/invitations` | Member mời `{ targetUserId }`; `409` nếu đã là member hoặc đang pending |
-| `GET` | `/api/groups/invitations?pageIndex=1&pageSize=20&status=PENDING` | Lời mời nhận; filter trạng thái |
+| `GET` | `/api/groups/invitations?pageIndex=1&pageSize=20&status=pending` | Lời mời nhận; filter trạng thái |
 | `POST` | `/api/groups/invitations/{invitationId}/accept` | Invitee chấp nhận và vào nhóm |
 | `POST` | `/api/groups/invitations/{invitationId}/reject` | Invitee từ chối |
 | `POST` | `/api/groups/invitations/{invitationId}/cancel` | Inviter hoặc owner hủy |
@@ -417,12 +417,12 @@ Hub xác thực và chuyển yêu cầu vào application service; business rule 
 
 1. Client đăng nhập, có JWT hợp lệ, kết nối `/hubs/chat` qua HTTPS/WSS.
 2. Hub xác thực User còn hợp lệ, lấy User ID từ claim; đăng ký connection ID vào tập kết nối của User bằng thao tác an toàn khi có nhiều request đồng thời.
-3. Server theo dõi tập connection ID riêng cho từng User. Kết nối đầu tiên làm User **đang kết nối**. Nếu `Visibility = VISIBLE`, phát `PresenceChanged(true)` tới bạn bè còn được phép xem. Nếu `HIDDEN`, không phát. Hai tab/thiết bị trở lên vẫn chỉ là một User online.
-4. User gọi `PATCH /api/presence/me` để chọn `HIDDEN` hoặc `VISIBLE`. Server lưu tùy chọn và `UpdatedAt`, tính lại online công khai với số kết nối hiện tại, rồi phát `PresenceChanged` **sau commit** nếu giá trị công khai đổi. Chọn `HIDDEN` không đóng Hub; chọn `VISIBLE` khi không có kết nối vẫn hiển thị offline. Request lặp cùng giá trị không phát event.
+3. Server theo dõi tập connection ID riêng cho từng User. Kết nối đầu tiên làm User **đang kết nối**. Nếu `Visibility = visible`, phát `PresenceChanged(true)` tới bạn bè còn được phép xem. Nếu `hidden`, không phát. Hai tab/thiết bị trở lên vẫn chỉ là một User online.
+4. User gọi `PATCH /api/presence/me` để chọn `hidden` hoặc `visible`. Server lưu tùy chọn và `UpdatedAt`, tính lại online công khai với số kết nối hiện tại, rồi phát `PresenceChanged` **sau commit** nếu giá trị công khai đổi. Chọn `hidden` không đóng Hub; chọn `visible` khi không có kết nối vẫn hiển thị offline. Request lặp cùng giá trị không phát event.
 5. Khi một tab ngắt, chỉ phát offline nếu đó là kết nối cuối **và** trạng thái công khai trước đó là online. Mất mạng đột ngột được xác định qua SignalR keepalive/timeout nên có độ trễ; server gỡ connection trong `OnDisconnectedAsync`. Khi process crash, client khác có thể chưa nhận event offline: UI tải lại snapshot lúc mở màn hình, reconnect và định kỳ khi đang hiển thị danh sách bạn bè.
 6. Client đăng ký listener trước khi tải snapshot. Sau kết nối/reconnect, tải lại trang bạn bè/inbox để lấy presence mới nhất; event có thể bị trễ hoặc mất. Đồng bộ messages direct/group theo khoảng `sequenceFrom`–`sequenceTo` và các trang `pageIndex`/`pageSize`.
 
-**Bảng quyết định:** `VISIBLE` + ≥1 kết nối → online; `VISIBLE` + 0 kết nối → offline; `HIDDEN` + bất kỳ số kết nối → offline đối với người khác. Chính User có thể xem `isConnected` thật qua `GET /api/presence/me`. Không cho client ghi trực tiếp `isOnline`. Snapshot `isOnline` của người khác chỉ trả cho bạn bè `ACCEPTED` không bị chặn; người lạ và người cùng nhóm nhưng chưa là bạn không được suy ra trạng thái từ API nhóm. Tránh trả presence trong danh sách lời mời.
+**Bảng quyết định:** `visible` + ≥1 kết nối → online; `visible` + 0 kết nối → offline; `hidden` + bất kỳ số kết nối → offline đối với người khác. Chính User có thể xem `isConnected` thật qua `GET /api/presence/me`. Không cho client ghi trực tiếp `isOnline`. Snapshot `isOnline` của người khác chỉ trả cho bạn bè `accepted` không bị chặn; người lạ và người cùng nhóm nhưng chưa là bạn không được suy ra trạng thái từ API nhóm. Tránh trả presence trong danh sách lời mời.
 
 Khi kết bạn được chấp nhận, hai client tải snapshot mới. Khi hủy bạn, chặn, suspend hoặc đổi quyền, server ngừng phát presence tới người không còn quyền và client bỏ cache trạng thái cũ. Một event đang trên đường truyền vẫn có thể đến muộn, nên client phải xóa trạng thái khi nhận thay đổi quan hệ và tải lại snapshot. Trong một instance, cập nhật map kết nối và tính chuyển trạng thái theo từng User phải được đồng bộ để hai kết nối đồng thời không phát online/offline sai thứ tự. Nhiều instance cần registry chia sẻ có lease/TTL và phát sự kiện khi trạng thái tổng thể đổi, không dựa vào bộ đếm từng node.
 
@@ -448,12 +448,12 @@ Khi kết bạn được chấp nhận, hai client tải snapshot mới. Khi h�
 ### 6.4. Kết bạn và chặn
 
 1. A gửi lời mời B bằng HTTP. Có thể làm việc này trước hoặc sau khi chat. B nhận `FriendshipChanged` nếu đang online.
-2. B chấp nhận/từ chối; chỉ khi `ACCEPTED` hai người mới thấy online của nhau. Client lấy lại snapshot presence sau thay đổi quan hệ.
+2. B chấp nhận/từ chối; chỉ khi `accepted` hai người mới thấy online của nhau. Client lấy lại snapshot presence sau thay đổi quan hệ.
 3. Nếu A hoặc B chặn người kia, service cập nhật block và đóng lời mời/quan hệ hiện tại trong transaction. Từ thời điểm block commit, request gửi tin hoặc lời mời mới bị từ chối. Lịch sử cũ vẫn chỉ hai thành viên được đọc.
 
 ### 6.5. Chat nhóm
 
-1. A tạo group; transaction tạo `GroupConversation` và `GroupMember(OWNER, JoinedSequence = 1)`. A mời B bằng HTTP. B nhận `GroupInvitationChanged` nếu đang kết nối, tự chấp nhận rồi có member row với `JoinedSequence = LastMessageSequence + 1`.
+1. A tạo group; transaction tạo `GroupConversation` và `GroupMember(owner, JoinedSequence = 1)`. A mời B bằng HTTP. B nhận `GroupInvitationChanged` nếu đang kết nối, tự chấp nhận rồi có member row với `JoinedSequence = LastMessageSequence + 1`.
 2. Member gửi `SendGroupMessage`. Service xác thực membership hiện hành và group chưa giải tán; khóa row group, tăng sequence, lưu message và cập nhật `LastMessageAt` trong cùng transaction. Commit xong mới phát tới member hiện hành. Tin vẫn lưu nếu một số member offline.
 3. Member tải lịch sử và đồng bộ sau reconnect bằng HTTP, luôn lọc `Sequence >= JoinedSequence`. Lúc bắt đầu catch-up, lấy `lastMessageSequence = N` từ group detail, đọc cố định `[max(lastAppliedSequence + 1, JoinedSequence), N]` theo trang tăng dần. Nếu có gap/event đến muộn, tải lại snapshot.
 4. Owner được đổi tên, xóa member, chuyển quyền hoặc giải tán. Member thường được rời nhóm. Khi bị xóa/rời, server ngừng gửi group event và API từ chối đọc lịch sử; khi vào lại, mốc `JoinedSequence` được đặt lại, không thấy tin cũ. Chỉ người gửi được thu hồi tin của mình; tombstone đến các member hiện hành đủ quyền xem tin đó.
