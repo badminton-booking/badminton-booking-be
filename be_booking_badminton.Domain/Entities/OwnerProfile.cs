@@ -5,11 +5,6 @@ namespace be_booking_badminton.Domain.Entities;
 
 public sealed class OwnerProfile : BaseEntity<Guid>
 {
-    public OwnerProfile()
-    {
-        Id = Guid.NewGuid();
-    }
-
     public Guid UserId { get; set; }
     public Guid ApprovedOwnerRequestId { get; set; }
     public string BusinessName { get; set; } = string.Empty;

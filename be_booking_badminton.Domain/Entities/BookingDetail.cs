@@ -5,11 +5,6 @@ namespace be_booking_badminton.Domain.Entities;
 
 public sealed class BookingDetail : BaseEntity<Guid>
 {
-    public BookingDetail()
-    {
-        Id = Guid.NewGuid();
-    }
-
     public Guid BookingId { get; set; }
     public Guid CourtId { get; set; }
     public BookingDetailStatus Status { get; set; } = BookingDetailStatus.PendingPayment;

@@ -5,11 +5,6 @@ namespace be_booking_badminton.Domain.Entities;
 
 public sealed class LedgerAccount : BaseEntity<Guid>
 {
-    public LedgerAccount()
-    {
-        Id = Guid.NewGuid();
-    }
-
     public Guid? OwnerProfileId { get; set; }
     public LedgerAccountType AccountType { get; set; }
     public long Balance { get; set; }

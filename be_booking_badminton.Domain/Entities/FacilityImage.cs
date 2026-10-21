@@ -4,11 +4,6 @@ namespace be_booking_badminton.Domain.Entities;
 
 public sealed class FacilityImage : BaseEntity<Guid>
 {
-    public FacilityImage()
-    {
-        Id = Guid.NewGuid();
-    }
-
     public Guid FacilityId { get; set; }
     public string ImageUrl { get; set; } = string.Empty;
     public bool IsCover { get; set; }

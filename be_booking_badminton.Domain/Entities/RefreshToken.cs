@@ -4,11 +4,6 @@ namespace be_booking_badminton.Domain.Entities;
 
 public sealed class RefreshToken : BaseEntity<Guid>
 {
-    public RefreshToken()
-    {
-        Id = Guid.NewGuid();
-    }
-
     public Guid UserId { get; set; }
     public string TokenHash { get; set; } = string.Empty;
     public Guid FamilyId { get; set; }

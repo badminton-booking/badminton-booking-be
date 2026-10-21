@@ -5,11 +5,6 @@ namespace be_booking_badminton.Domain.Entities;
 
 public sealed class CampaignCode : BaseEntity<Guid>
 {
-    public CampaignCode()
-    {
-        Id = Guid.NewGuid();
-    }
-
     public Guid CampaignId { get; set; }
     public string Code { get; set; } = string.Empty;
     public CampaignCodeVisibility Visibility { get; set; }

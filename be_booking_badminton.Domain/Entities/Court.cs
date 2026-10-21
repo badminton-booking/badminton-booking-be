@@ -5,11 +5,6 @@ namespace be_booking_badminton.Domain.Entities;
 
 public sealed class Court : BaseEntity<Guid>
 {
-    public Court()
-    {
-        Id = Guid.NewGuid();
-    }
-
     public Guid FacilityId { get; set; }
     public Guid? ScheduleTemplateId { get; set; }
     public string Name { get; set; } = string.Empty;

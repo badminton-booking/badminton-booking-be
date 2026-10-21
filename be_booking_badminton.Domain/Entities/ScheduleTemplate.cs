@@ -5,11 +5,6 @@ namespace be_booking_badminton.Domain.Entities;
 
 public sealed class ScheduleTemplate : BaseEntity<Guid>
 {
-    public ScheduleTemplate()
-    {
-        Id = Guid.NewGuid();
-    }
-
     public Guid FacilityId { get; set; }
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }

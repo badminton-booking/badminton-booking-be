@@ -16,6 +16,10 @@ public sealed class ReportConfiguration : IEntityTypeConfiguration<Report>
             .HasColumnType("uuid")
             .IsRequired();
 
+        builder.Property(entity => entity.HandledByUserId)
+            .HasColumnName("handled_by_user_id")
+            .HasColumnType("uuid");
+
         builder.Property(entity => entity.TargetType)
             .HasColumnName("target_type")
             .HasColumnType("varchar(20)")
@@ -64,6 +68,12 @@ public sealed class ReportConfiguration : IEntityTypeConfiguration<Report>
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("fk_reports_reporter_user_id");
 
+        builder.HasOne(entity => entity.HandledByUser)
+            .WithMany()
+            .HasForeignKey(entity => entity.HandledByUserId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .HasConstraintName("fk_reports_handled_by_user_id");
+
         builder.ToTable("reports", table =>
         {
             table.HasCheckConstraint("ck_reports_status",
@@ -76,6 +86,8 @@ public sealed class ReportConfiguration : IEntityTypeConfiguration<Report>
                 "length(btrim(subject)) > 0");
             table.HasCheckConstraint("ck_reports_description",
                 "length(btrim(description)) > 0");
+            table.HasCheckConstraint("ck_reports_handler",
+                "(status IN ('OPEN', 'CANCELLED') AND handled_by_user_id IS NULL) OR (status IN ('IN_PROGRESS', 'RESOLVED', 'REJECTED') AND handled_by_user_id IS NOT NULL)");
             table.HasCheckConstraint("ck_reports_closed_at",
                 "(status IN ('RESOLVED', 'REJECTED', 'CANCELLED') AND closed_at IS NOT NULL) OR (status IN ('OPEN', 'IN_PROGRESS') AND closed_at IS NULL)");
             table.HasCheckConstraint("ck_reports_closed_time",
@@ -88,6 +100,11 @@ public sealed class ReportConfiguration : IEntityTypeConfiguration<Report>
             .HasDatabaseName("ix_reports_reporter_status_activity")
             .IsDescending(false, false, true)
             .HasFilter("is_deleted = false");
+
+        builder.HasIndex(entity => new { entity.HandledByUserId, entity.Status, entity.LastMessageAt }, "ix_reports_handler_status_activity")
+            .HasDatabaseName("ix_reports_handler_status_activity")
+            .IsDescending(false, false, true)
+            .HasFilter("handled_by_user_id IS NOT NULL AND is_deleted = false");
 
         builder.HasIndex(entity => new { entity.Status, entity.LastMessageAt }, "ix_reports_admin_inbox")
             .HasDatabaseName("ix_reports_admin_inbox")

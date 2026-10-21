@@ -1761,6 +1761,10 @@ namespace be_booking_badminton.Infrastructure.Migrations
                         .HasColumnType("varchar(4000)")
                         .HasColumnName("description");
 
+                    b.Property<Guid?>("HandledByUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("handled_by_user_id");
+
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
@@ -1813,6 +1817,11 @@ namespace be_booking_badminton.Infrastructure.Migrations
                         .HasDatabaseName("ix_reports_admin_inbox")
                         .HasFilter("status IN ('OPEN', 'IN_PROGRESS') AND is_deleted = false");
 
+                    b.HasIndex(new[] { "HandledByUserId", "Status", "LastMessageAt" }, "ix_reports_handler_status_activity")
+                        .IsDescending(false, false, true)
+                        .HasDatabaseName("ix_reports_handler_status_activity")
+                        .HasFilter("handled_by_user_id IS NOT NULL AND is_deleted = false");
+
                     b.HasIndex(new[] { "ReporterUserId", "Status", "LastMessageAt" }, "ix_reports_reporter_status_activity")
                         .IsDescending(false, false, true)
                         .HasDatabaseName("ix_reports_reporter_status_activity")
@@ -1830,6 +1839,8 @@ namespace be_booking_badminton.Infrastructure.Migrations
                             t.HasCheckConstraint("ck_reports_closed_time", "closed_at IS NULL OR closed_at >= created_at");
 
                             t.HasCheckConstraint("ck_reports_description", "length(btrim(description)) > 0");
+
+                            t.HasCheckConstraint("ck_reports_handler", "(status IN ('OPEN', 'CANCELLED') AND handled_by_user_id IS NULL) OR (status IN ('IN_PROGRESS', 'RESOLVED', 'REJECTED') AND handled_by_user_id IS NOT NULL)");
 
                             t.HasCheckConstraint("ck_reports_last_message_time", "last_message_at >= created_at");
 
@@ -2808,12 +2819,20 @@ namespace be_booking_badminton.Infrastructure.Migrations
 
             modelBuilder.Entity("be_booking_badminton.Domain.Entities.Report", b =>
                 {
+                    b.HasOne("be_booking_badminton.Domain.Entities.User", "HandledByUser")
+                        .WithMany()
+                        .HasForeignKey("HandledByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_reports_handled_by_user_id");
+
                     b.HasOne("be_booking_badminton.Domain.Entities.User", "ReporterUser")
                         .WithMany()
                         .HasForeignKey("ReporterUserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_reports_reporter_user_id");
+
+                    b.Navigation("HandledByUser");
 
                     b.Navigation("ReporterUser");
                 });

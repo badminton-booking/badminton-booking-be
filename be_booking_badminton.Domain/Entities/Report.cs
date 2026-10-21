@@ -5,12 +5,8 @@ namespace be_booking_badminton.Domain.Entities;
 
 public sealed class Report : BaseEntity<Guid>
 {
-    public Report()
-    {
-        Id = Guid.NewGuid();
-    }
-
     public Guid ReporterUserId { get; set; }
+    public Guid? HandledByUserId { get; set; }
     public ReportTargetType TargetType { get; set; }
     public Guid? TargetId { get; set; }
     public string Subject { get; set; } = string.Empty;
@@ -20,4 +16,5 @@ public sealed class Report : BaseEntity<Guid>
     public DateTimeOffset? ClosedAt { get; set; }
 
     public User ReporterUser { get; set; } = null!;
+    public User? HandledByUser { get; set; }
 }

@@ -5,11 +5,6 @@ namespace be_booking_badminton.Domain.Entities;
 
 public sealed class Feedback : BaseEntity<Guid>
 {
-    public Feedback()
-    {
-        Id = Guid.NewGuid();
-    }
-
     public Guid UserId { get; set; }
     public Guid? CourtId { get; set; }
     public Guid? BookingDetailId { get; set; }

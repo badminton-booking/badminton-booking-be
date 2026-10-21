@@ -5,11 +5,6 @@ namespace be_booking_badminton.Domain.Entities;
 
 public sealed class CourtSlotBlock : BaseEntity<Guid>
 {
-    public CourtSlotBlock()
-    {
-        Id = Guid.NewGuid();
-    }
-
     public Guid CourtId { get; set; }
     public Guid TemplateSlotId { get; set; }
     public CourtSlotBlockType BlockType { get; set; }

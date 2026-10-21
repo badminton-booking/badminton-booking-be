@@ -4,11 +4,6 @@ namespace be_booking_badminton.Domain.Entities;
 
 public sealed class UserRole : BaseEntity<Guid>
 {
-    public UserRole()
-    {
-        Id = Guid.NewGuid();
-    }
-
     public Guid UserId { get; set; }
     public Guid RoleId { get; set; }
 

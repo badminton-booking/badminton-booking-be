@@ -5,11 +5,6 @@ namespace be_booking_badminton.Domain.Entities;
 
 public sealed class OwnerRequest : BaseEntity<Guid>
 {
-    public OwnerRequest()
-    {
-        Id = Guid.NewGuid();
-    }
-
     public Guid UserId { get; set; }
     public OwnerRequestStatus Status { get; set; } = OwnerRequestStatus.Pending;
     public string BusinessName { get; set; } = string.Empty;

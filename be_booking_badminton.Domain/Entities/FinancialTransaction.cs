@@ -5,11 +5,6 @@ namespace be_booking_badminton.Domain.Entities;
 
 public sealed class FinancialTransaction : BaseEntity<Guid>
 {
-    public FinancialTransaction()
-    {
-        Id = Guid.NewGuid();
-    }
-
     public Guid? BookingId { get; set; }
     public Guid? OwnerProfileId { get; set; }
     public Guid? DestinationBankAccountId { get; set; }

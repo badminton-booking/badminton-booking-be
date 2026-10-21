@@ -4,11 +4,6 @@ namespace be_booking_badminton.Domain.Entities;
 
 public sealed class ReportMessage : BaseEntity<Guid>
 {
-    public ReportMessage()
-    {
-        Id = Guid.NewGuid();
-    }
-
     public Guid ReportId { get; set; }
     public Guid SenderUserId { get; set; }
     public string Content { get; set; } = string.Empty;
