@@ -1,6 +1,8 @@
 # DATABASE — CỤM CAMPAIGN
 
-> Campaign là chương trình giảm giá dùng chung cho Admin và Owner. Mỗi Campaign có nhiều mã public/private; BookingDetail liên kết tối đa một CampaignCode và snapshot kết quả giảm giá.
+> Campaign là chương trình giảm giá dùng chung cho Admin và Owner. Mỗi Campaign có nhiều mã public/private; mỗi Booking dùng tối đa một CampaignCode, snapshot kết quả giảm giá tại Booking và phân bổ số tiền giảm xuống BookingDetail. Lượt dùng mã **đếm trực tiếp từ `bookings`** (booking giữ `campaign_code_id`), không có bảng redemption riêng.
+>
+> Campaign của Admin (`owner_profile_id IS NULL`): sàn chịu tiền giảm. Campaign của Owner: Owner chịu tiền giảm.
 
 ## Enum definitions
 
@@ -19,6 +21,13 @@
 |---|
 | `PERCENTAGE` |
 | `FIXED_AMOUNT` |
+
+### `CampaignEligibility`
+
+| Value | Ý nghĩa |
+|---|---|
+| `ALL` | Mọi Customer |
+| `FIRST_BOOKING` | Chỉ Customer chưa có Booking nào được thanh toán thành công |
 
 ### `CampaignTargetType`
 
@@ -62,6 +71,7 @@
 | `max_order_amount` | `bigint` | Yes | Đơn vị VND; NULL là không giới hạn |
 | `min_discount_amount` | `bigint` | Yes | Đơn vị VND; NULL là không đặt mức tối thiểu |
 | `max_discount_amount` | `bigint` | Yes | Đơn vị VND; NULL là không đặt mức tối đa |
+| `eligibility` | `varchar(20)` | No | Default `ALL`, CHECK `CampaignEligibility` |
 | `starts_at` | `timestamptz` | No |  |
 | `ends_at` | `timestamptz` | No |  |
 | `status` | `varchar(20)` | No | Default `DRAFT`, CHECK `CampaignStatus` |
@@ -80,6 +90,7 @@
 | `ck_campaigns_order_amount` | `min_order_amount >= 0 AND (max_order_amount IS NULL OR max_order_amount >= min_order_amount)` |
 | `ck_campaigns_discount_amount_range` | `min_discount_amount IS NULL OR min_discount_amount >= 0`; `max_discount_amount IS NULL OR max_discount_amount > 0`; nếu cả hai có giá trị thì `max_discount_amount >= min_discount_amount` |
 | `ck_campaigns_period` | `ends_at > starts_at` |
+| `ck_campaigns_eligibility` | `eligibility IN ('ALL', 'FIRST_BOOKING')` |
 
 ### Indexes
 
@@ -100,8 +111,9 @@
 | `code` | `varchar(50)` | No | UNIQUE |
 | `visibility` | `varchar(20)` | No | CHECK `CampaignCodeVisibility` |
 | `status` | `varchar(20)` | No | Default `ACTIVE`, CHECK `CampaignCodeStatus` |
-| `usage_limit` | `integer` | Yes | NULL là không giới hạn |
-| `used_count` | `integer` | No | Default `0` |
+| `usage_limit` | `integer` | Yes | Tổng số lượt tối đa; NULL là không giới hạn |
+| `per_user_limit` | `integer` | Yes | Số lượt tối đa của mỗi Customer; NULL là không giới hạn |
+| `used_count` | `integer` | No | Default `0`; cache hiển thị, nguồn thật là đếm từ `bookings`; refresh khi áp/hủy mã |
 | `is_deleted` | `boolean` | No | Default `false` |
 | `created_at` | `timestamptz` | No | Default `now()` |
 | `updated_at` | `timestamptz` | Yes |  |
@@ -114,6 +126,8 @@
 | `ck_campaign_codes_visibility` | `visibility IN ('PUBLIC', 'PRIVATE')` |
 | `ck_campaign_codes_status` | `status IN ('ACTIVE', 'DISABLED')` |
 | `ck_campaign_codes_usage_limit` | `usage_limit IS NULL OR usage_limit > 0` |
+| `ck_campaign_codes_per_user_limit` | `per_user_limit IS NULL OR per_user_limit > 0` |
+| `ck_campaign_codes_per_user_within_usage` | `per_user_limit IS NULL OR usage_limit IS NULL OR per_user_limit <= usage_limit` |
 | `ck_campaign_codes_used_count` | `used_count >= 0 AND (usage_limit IS NULL OR used_count <= usage_limit)` |
 
 ### Indexes
@@ -169,8 +183,13 @@
 | `campaign_target_union` | Khi Campaign có nhiều target cụ thể, BookingDetail hợp lệ nếu khớp ít nhất một target |
 | `public_campaign_code` | Mã `PUBLIC` được hiển thị cho Customer đủ điều kiện để chọn; vẫn phải qua bước xác nhận áp mã |
 | `private_campaign_code` | Mã `PRIVATE` không xuất hiện trong danh sách công khai; Customer phải nhập chính xác `code` được Owner/Admin cung cấp |
-| `campaign_code_eligibility` | Campaign và CampaignCode phải `ACTIVE`, chưa soft-delete, thỏa `starts_at <= now() AND now() < ends_at`, đồng thời `used_count < usage_limit` nếu có giới hạn |
-| `campaign_code_usage_atomic` | Mỗi lần dùng mã thành công phải tăng `used_count` nguyên tử, có điều kiện không vượt `usage_limit`, trong cùng database transaction với nghiệp vụ áp mã |
+| `campaign_code_eligibility` | Campaign và CampaignCode phải `ACTIVE`, chưa soft-delete, thỏa `starts_at <= now() AND now() < ends_at` |
+| `campaign_code_usage_atomic` | Khi áp mã: khóa dòng `campaign_codes` bằng `SELECT ... FOR UPDATE`, đếm số `bookings` dùng mã ở trạng thái `PENDING_PAYMENT`/`CONFIRMED`/`COMPLETED`; chỉ cho dùng nếu số lượt `< usage_limit`, rồi cập nhật `used_count` (cache) — tất cả trong cùng database transaction với việc tạo Booking |
+| `campaign_per_user_limit` | Trong cùng khóa trên, đếm số `bookings` dùng mã của đúng `user_id` ở các trạng thái còn hiệu lực; chỉ cho dùng nếu `< per_user_limit` |
+| `campaign_first_booking` | `eligibility = FIRST_BOOKING`: Customer chưa có Booking nào từng `CONFIRMED` hoặc `COMPLETED` |
+| `campaign_usage_release` | Lượt dùng mã đếm từ `bookings` ở trạng thái `PENDING_PAYMENT`/`CONFIRMED`/`COMPLETED`; booking `EXPIRED`/`CANCELLED` tự rớt khỏi phép đếm nên lượt được hoàn tự nhiên, không cần trạng thái redemption riêng |
+| `campaign_funding` | Campaign của Admin (`funded_by = PLATFORM`): sàn chịu tiền giảm, bù lại Owner qua `commissions.platform_subsidy` (xem cụm Giao dịch). Campaign của Owner (`funded_by = OWNER`): Owner tự chịu tiền giảm. `funded_by` lưu trong `bookings.campaign_snapshot` |
+| `campaign_discount_locked` | Campaign đã có `bookings` dùng mã thì không được sửa mức giảm và điều kiện; chỉ được chuyển `PAUSED` hoặc `ENDED` |
 | `campaign_order_eligibility` | Giá trị đủ điều kiện phải `>= min_order_amount` và `<= max_order_amount` nếu Campaign có giới hạn tối đa |
 | `campaign_discount_calculation` | Tính discount gốc theo `discount_type`, sau đó áp `min_discount_amount`, `max_discount_amount`; discount cuối cùng không vượt giá trị đủ điều kiện và tổng tiền sau giảm không âm |
 | `campaign_group_slot_discount` | Với group slot, target `TEMPLATE_SLOT` chỉ giảm trên phần giá của các TemplateSlot thành phần khớp target |
@@ -185,6 +204,6 @@
 | `owner_profiles` | 1 — N | `campaigns` | `campaigns.owner_profile_id` |
 | `campaigns` | 1 — N | `campaign_codes` | `campaign_codes.campaign_id` |
 | `campaigns` | 1 — N | `campaign_targets` | `campaign_targets.campaign_id` |
-| `campaign_codes` | 1 — N | `booking_details` | `booking_details.campaign_code_id` |
+| `campaign_codes` | 1 — N | `bookings` | `bookings.campaign_code_id` |
 
 > `campaign_targets.target_type + target_id` là Polymorphic Association nên không có FK vật lý đến các bảng target.
