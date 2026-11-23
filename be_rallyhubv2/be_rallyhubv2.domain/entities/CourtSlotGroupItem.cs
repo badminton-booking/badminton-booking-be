@@ -1,6 +1,13 @@
-﻿namespace be_rallyhubv2.domain.entities;
+using be_rallyhubv2.domain.common;
 
-public class CourtSlotGroupItem
+namespace be_rallyhubv2.domain.entities;
+
+public class CourtSlotGroupItem : BaseEntity
 {
-    
+    public Guid TemplateSlotId { get; set; }
+    public Guid CourtSlotGroupId { get; set; }
+
+    // ===== Relationships =====
+    public TemplateSlot? TemplateSlot { get; set; }
+    public CourtSlotGroup? CourtSlotGroup { get; set; }
 }

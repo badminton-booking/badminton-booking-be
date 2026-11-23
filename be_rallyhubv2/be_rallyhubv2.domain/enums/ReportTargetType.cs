@@ -1,6 +1,11 @@
-﻿namespace be_rallyhubv2.domain.enums;
+namespace be_rallyhubv2.domain.enums;
 
-public class ReportTargetType
+public enum ReportTargetType
 {
-    
+    General,
+    User,
+    Facility,
+    Court,
+    Booking,
+    Feedback
 }

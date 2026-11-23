@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop, "feature/**", "bugfix/**", "hotfix/**", "release/**"]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+# Mỗi nhánh chỉ chạy 1 lượt: push mới thì hủy lượt cũ đang chạy
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# Quyền tối thiểu: chỉ đọc code
+permissions:
+  contents: read
+
+env:
+  SOLUTION: be_rallyhubv2/be_rallyhubv2.sln
+  PERSISTENCE: be_rallyhubv2/be_rallyhubv2.persistence
+  API: be_rallyhubv2/be_rallyhubv2.api
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  build:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 8.0.x
+      - uses: actions/cache@v5
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+          restore-keys: nuget-${{ runner.os }}-
+      - run: dotnet restore $SOLUTION
+      - run: dotnet build $SOLUTION --configuration Release --no-restore
+      - run: dotnet test $SOLUTION --configuration Release --no-build
+
+  database:
+    name: Migrations on PostgreSQL
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: build
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      ConnectionStrings__Postgres: Host=localhost;Port=5432;Database=rallyhub_ci;Username=postgres;Password=postgres
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 8.0.x
+      - uses: actions/cache@v5
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+          restore-keys: nuget-${{ runner.os }}-
+      - run: dotnet tool install --global dotnet-ef --version 8.0.11
+      - run: dotnet restore $SOLUTION
+
+      - name: Model phải khớp migration (quên tạo migration thì đỏ)
+        run: dotnet ef migrations has-pending-model-changes --project $PERSISTENCE --startup-project $API
+
+      - name: Áp toàn bộ migration lên database trống
+        run: dotnet ef database update --project $PERSISTENCE --startup-project $API

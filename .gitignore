@@ -480,3 +480,5 @@ $RECYCLE.BIN/
 # Local ASP.NET Core settings containing development secrets
 **/appsettings.Development.json
 **/appsettings.json
+
+be_rallyhubv2/be_rallyhubv2.api/docs/

@@ -9,8 +9,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.22"/>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2"/>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.22" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.11">
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+          <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
     </ItemGroup>
 
     <ItemGroup>
@@ -29,6 +33,7 @@
       <Folder Include="dependencyInjection\extensions\" />
       <Folder Include="dependencyInjection\openapi\" />
       <Folder Include="dependencyInjection\options\" />
+      <Folder Include="docs\guide\" />
       <Folder Include="middlewares\" />
       <Folder Include="security\" />
       <Folder Include="startup\" />
