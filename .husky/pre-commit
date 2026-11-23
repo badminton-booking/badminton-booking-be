@@ -3,6 +3,13 @@
 
 set -e
 
-echo "Running pre-commit build check..."
-dotnet build HoaTheoMua.sln -c Release --nologo
-echo "Pre-commit build check passed"
+# Luu danh sach file .cs dang staged truoc khi format
+staged_cs=$(git diff --cached --name-only --diff-filter=ACM -- '*.cs')
+
+# Format cac file .cs staged (task "format-staged-csharp", group pre-commit)
+dotnet husky run --group pre-commit
+
+# Neu format co sua, re-stage DUNG nhung file .cs do (khong gom file khac)
+if [ -n "$staged_cs" ]; then
+  echo "$staged_cs" | tr '\n' '\0' | xargs -0 git add --
+fi
