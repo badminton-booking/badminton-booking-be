@@ -1,0 +1,27 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+set -e
+
+SLN="be_rallyhubv2/be_rallyhubv2.sln"
+
+# 1) Kiem tra ten branch
+current_branch=$(git rev-parse --abbrev-ref HEAD)
+pattern="^(feature|bugfix|hotfix|release)/.+$|^(develop|main|master)$"
+if ! echo "$current_branch" | grep -qE "$pattern"; then
+  echo "Invalid branch name: $current_branch"
+  echo "Allowed: feature/*, bugfix/*, hotfix/*, release/*, develop, main, master"
+  exit 1
+fi
+
+# 2) Build (gac cong truoc khi push)
+echo "[1/2] Restore..."
+dotnet restore "$SLN" --nologo
+echo "[2/2] Build (Release)..."
+dotnet build "$SLN" -c Release --no-restore --nologo
+
+# 3) Test: bat lai khi da co test project
+# echo "[3/3] Test..."
+# dotnet test "$SLN" -c Release --no-build --no-restore --nologo
+
+echo "pre-push OK"

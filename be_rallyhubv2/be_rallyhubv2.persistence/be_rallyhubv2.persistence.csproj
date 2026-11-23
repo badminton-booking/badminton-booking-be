@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\be_rallyhubv2.application\be_rallyhubv2.application.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="configurations\" />
+      <Folder Include="constants\" />
+      <Folder Include="dependencyInjection\" />
+      <Folder Include="interceptors\" />
+      <Folder Include="repositories\" />
+    </ItemGroup>
+
+</Project>
