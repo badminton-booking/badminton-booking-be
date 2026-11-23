@@ -1,0 +1,13 @@
+{
+   "$schema": "https://alirezanet.github.io/Husky.Net/schema.json",
+   "tasks": [
+      {
+         "name": "format-staged-csharp",
+         "group": "pre-commit",
+         "command": "dotnet",
+         "args": [ "format", "be_rallyhubv2/be_rallyhubv2.sln", "--include", "${staged}" ],
+         "include": [ "**/*.cs" ],
+         "pathMode": "absolute"
+      }
+   ]
+}

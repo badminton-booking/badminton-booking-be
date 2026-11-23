@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\be_rallyhubv2.application\be_rallyhubv2.application.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="authentication\" />
+      <Folder Include="backgroundJobs\" />
+      <Folder Include="caching\" />
+      <Folder Include="dependencyInjection\" />
+      <Folder Include="files\" />
+      <Folder Include="mail\" />
+      <Folder Include="maps\" />
+      <Folder Include="passwordHasher\" />
+      <Folder Include="payments\" />
+    </ItemGroup>
+
+</Project>

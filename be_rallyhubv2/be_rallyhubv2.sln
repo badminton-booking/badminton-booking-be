@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "be_rallyhubv2.api", "be_rallyhubv2.api\be_rallyhubv2.api.csproj", "{AAA2D87A-4E88-4E5D-9D9A-AD9C3BBBD2B3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "be_rallyhubv2.presentation", "be_rallyhubv2.presentation\be_rallyhubv2.presentation.csproj", "{14617C4A-3AC7-42B7-9968-3E336402A66D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "be_rallyhubv2.infrastructure", "be_rallyhubv2.infrastructure\be_rallyhubv2.infrastructure.csproj", "{9B974D60-A4CB-4BD3-BF89-7799C81D82B0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "be_rallyhubv2.persistence", "be_rallyhubv2.persistence\be_rallyhubv2.persistence.csproj", "{56359E36-D7EB-437B-BA99-6DA3EA4C94D7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "be_rallyhubv2.application", "be_rallyhubv2.application\be_rallyhubv2.application.csproj", "{BE484A19-0B73-4FC5-AD0E-1CC9CD9BA54A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "be_rallyhubv2.contract", "be_rallyhubv2.contract\be_rallyhubv2.contract.csproj", "{6222D25C-6BF0-4A70-9831-1ACC8910BE6E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "be_rallyhubv2.domain", "be_rallyhubv2.domain\be_rallyhubv2.domain.csproj", "{6A8563CD-96EB-441F-944D-2CBA606BDC81}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AAA2D87A-4E88-4E5D-9D9A-AD9C3BBBD2B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AAA2D87A-4E88-4E5D-9D9A-AD9C3BBBD2B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AAA2D87A-4E88-4E5D-9D9A-AD9C3BBBD2B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AAA2D87A-4E88-4E5D-9D9A-AD9C3BBBD2B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14617C4A-3AC7-42B7-9968-3E336402A66D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14617C4A-3AC7-42B7-9968-3E336402A66D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14617C4A-3AC7-42B7-9968-3E336402A66D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14617C4A-3AC7-42B7-9968-3E336402A66D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B974D60-A4CB-4BD3-BF89-7799C81D82B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B974D60-A4CB-4BD3-BF89-7799C81D82B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B974D60-A4CB-4BD3-BF89-7799C81D82B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B974D60-A4CB-4BD3-BF89-7799C81D82B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56359E36-D7EB-437B-BA99-6DA3EA4C94D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56359E36-D7EB-437B-BA99-6DA3EA4C94D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56359E36-D7EB-437B-BA99-6DA3EA4C94D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56359E36-D7EB-437B-BA99-6DA3EA4C94D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE484A19-0B73-4FC5-AD0E-1CC9CD9BA54A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE484A19-0B73-4FC5-AD0E-1CC9CD9BA54A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE484A19-0B73-4FC5-AD0E-1CC9CD9BA54A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE484A19-0B73-4FC5-AD0E-1CC9CD9BA54A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6222D25C-6BF0-4A70-9831-1ACC8910BE6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6222D25C-6BF0-4A70-9831-1ACC8910BE6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6222D25C-6BF0-4A70-9831-1ACC8910BE6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6222D25C-6BF0-4A70-9831-1ACC8910BE6E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A8563CD-96EB-441F-944D-2CBA606BDC81}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A8563CD-96EB-441F-944D-2CBA606BDC81}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A8563CD-96EB-441F-944D-2CBA606BDC81}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A8563CD-96EB-441F-944D-2CBA606BDC81}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
