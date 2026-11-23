@@ -1,9 +1,19 @@
+using be_rallyhubv2.persistence.dependencyInjection;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+
+
+var connectionString = builder.Configuration.GetConnectionString("Postgres")
+    ?? throw new InvalidOperationException("Thiếu cấu hình ConnectionString:Postgres");
+
+builder.Services.AddPersistence(connectionString);
+
 
 var app = builder.Build();
 
