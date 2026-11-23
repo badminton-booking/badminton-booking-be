@@ -1,0 +1,9 @@
+namespace be_rallyhubv2.domain.enums;
+
+public enum CampaignStatus
+{
+    Draft,
+    Active,
+    Paused,
+    Ended
+}

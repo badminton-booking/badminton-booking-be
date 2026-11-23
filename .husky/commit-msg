@@ -1,0 +1,28 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Conventional Commits: type(scope): subject
+# Types: feat, fix, docs, style, refactor, perf, test, chore, build, ci
+commit_msg=$(cat "$1")
+
+# Bo qua merge commit
+case "$commit_msg" in
+  "Merge "*) exit 0 ;;
+esac
+
+pattern="^(feat|fix|docs|style|refactor|perf|test|chore|build|ci)(\(.+\))?: .{1,}"
+
+if ! echo "$commit_msg" | grep -qE "$pattern"; then
+  echo "Invalid commit message format!"
+  echo ""
+  echo "Must follow Conventional Commits: type(scope): subject"
+  echo "Types: feat, fix, docs, style, refactor, perf, test, chore, build, ci"
+  echo ""
+  echo "Examples:"
+  echo "  feat: add booking creation"
+  echo "  fix(payment): match sepay webhook by booking_code"
+  echo "  chore: setup husky hooks"
+  exit 1
+fi
+
+echo "Commit message OK"
