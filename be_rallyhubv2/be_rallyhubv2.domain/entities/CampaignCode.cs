@@ -10,7 +10,6 @@ public class CampaignCode : BaseEntity
     public CampaignCodeVisibility Visibility { get; set; }
     public CampaignCodeStatus Status { get; set; } = CampaignCodeStatus.Active;
     public int? UsageLimit { get; set; }
-    public int? PerUserLimit { get; set; }
     public int UsedCount { get; set; }
 
     // ===== Relationships =====

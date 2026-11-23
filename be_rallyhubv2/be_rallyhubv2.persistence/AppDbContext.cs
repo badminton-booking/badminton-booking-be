@@ -73,7 +73,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options): DbContext(opt
             configurationBuilder
                 .Properties(enumType)
                 .HaveConversion(typeof(EnumStringConverter<>).MakeGenericType(enumType))
-                .HaveMaxLength(50);
+                .HaveMaxLength(30);
         }
         
         base.ConfigureConventions(configurationBuilder);

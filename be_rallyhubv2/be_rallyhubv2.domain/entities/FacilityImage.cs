@@ -6,6 +6,7 @@ public class FacilityImage : BaseEntity
 {
     public Guid FacilityId { get; set; }
     public string ImageUrl { get; set; } = null!;
+    public string StorageKey { get; set; } = null!; // public_id trên Cloudinary, dùng để xóa file
     public bool IsCover { get; set; }
     public short DisplayOrder { get; set; }
 

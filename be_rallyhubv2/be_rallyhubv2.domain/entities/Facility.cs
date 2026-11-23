@@ -10,6 +10,8 @@ public class Facility : BaseEntity
     public string? Description { get; set; }
     public string? PhoneNumber { get; set; }
     public string AddressLine { get; set; } = null!;
+    public string Province { get; set; } = null!;
+    public string District { get; set; } = null!;
     public decimal? Latitude { get; set; }
     public decimal? Longitude { get; set; }
     public FacilityStatus Status { get; set; } = FacilityStatus.Draft;

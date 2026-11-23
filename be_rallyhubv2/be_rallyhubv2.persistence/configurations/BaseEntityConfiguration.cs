@@ -11,7 +11,7 @@ public abstract class BaseEntityConfiguration<TEntity>: IEntityTypeConfiguration
         builder.HasKey(x => x.Id);
 
         builder.Property(entity => entity.CreatedAt)
-            .HasDefaultValueSql("now");
+            .HasDefaultValueSql("now()");
         
         builder.Property(entity => entity.IsDeleted)
             .HasDefaultValue(false);

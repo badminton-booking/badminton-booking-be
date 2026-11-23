@@ -6,7 +6,7 @@ namespace be_rallyhubv2.persistence.configurations;
 
 public static class EntityTypeBuilderExtensions
 {
-    public static IndexBuilder<TEntity> HasNameIndex<TEntity>(
+    public static IndexBuilder<TEntity> HasNamedIndex<TEntity>(
         this EntityTypeBuilder<TEntity> builder,
         Expression<Func<TEntity, object?>> columns, string name) where TEntity : class
         => builder.HasIndex(columns, name).HasDatabaseName(name);
