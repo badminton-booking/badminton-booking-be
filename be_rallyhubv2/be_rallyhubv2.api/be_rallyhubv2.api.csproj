@@ -33,7 +33,8 @@
       <Folder Include="dependencyInjection\extensions\" />
       <Folder Include="dependencyInjection\openapi\" />
       <Folder Include="dependencyInjection\options\" />
-      <Folder Include="docs\guide\" />
+      <Folder Include="docs\db_configuration_code\" />
+      <Folder Include="docs\found_src_code\" />
       <Folder Include="middlewares\" />
       <Folder Include="security\" />
       <Folder Include="startup\" />

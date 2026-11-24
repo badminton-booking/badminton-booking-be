@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+    <resheader name="version"><value>2.0</value></resheader>
+    <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+    <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+    <data name="Validation.Failed" xml:space="preserve"><value>Dữ liệu không hợp lệ.</value></data>
+    <data name="Auth.Unauthorized" xml:space="preserve"><value>Bạn chưa đăng nhập.</value></data>
+    <data name="Auth.Forbidden" xml:space="preserve"><value>Bạn không có quyền thực hiện thao tác này.</value></data>
+    <data name="Common.NotFound" xml:space="preserve"><value>Không tìm thấy {0}.</value></data>
+    <data name="Common.Conflict" xml:space="preserve"><value>Yêu cầu xung đột với trạng thái hiện tại.</value></data>
+    <data name="Common.ConcurrencyConflict" xml:space="preserve"><value>Dữ liệu đã bị người khác thay đổi. Hãy tải lại và thử lại.</value></data>
+    <data name="Common.Unexpected" xml:space="preserve"><value>Đã có lỗi xảy ra. Vui lòng thử lại sau.</value></data>
+    <data name="Common.RateLimited" xml:space="preserve"><value>Bạn thao tác quá nhanh. Vui lòng chậm lại.</value></data>
+    <data name="Common.OriginNotAllowed" xml:space="preserve"><value>Nguồn gửi yêu cầu không được phép.</value></data>
+</root>
