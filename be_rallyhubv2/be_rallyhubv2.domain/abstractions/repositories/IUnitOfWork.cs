@@ -1,0 +1,9 @@
+﻿namespace be_rallyhubv2.domain.abstractions.repositories;
+
+public interface IUnitOfWork
+{
+    Task BeginTransactionAsync(CancellationToken cancellationToken);
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken);
+    Task CommitAsync(CancellationToken cancellationToken);
+    Task RollbackAsync(CancellationToken cancellationToken);
+}

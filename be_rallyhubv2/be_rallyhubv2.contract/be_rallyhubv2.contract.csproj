@@ -11,12 +11,20 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="abstractions\" />
       <Folder Include="constants\" />
-      <Folder Include="resources\" />
       <Folder Include="services\booking\" />
       <Folder Include="services\facility\" />
       <Folder Include="templates\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="MediatR" Version="12.4.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Update="resources\ErrorMessages.vi.resx">
+        <DependentUpon>ErrorMessages.cs</DependentUpon>
+      </EmbeddedResource>
     </ItemGroup>
 
 </Project>

@@ -1,5 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+#
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "be_rallyhubv2.api", "be_rallyhubv2.api\be_rallyhubv2.api.csproj", "{AAA2D87A-4E88-4E5D-9D9A-AD9C3BBBD2B3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "be_rallyhubv2.presentation", "be_rallyhubv2.presentation\be_rallyhubv2.presentation.csproj", "{14617C4A-3AC7-42B7-9968-3E336402A66D}"
@@ -13,6 +14,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "be_rallyhubv2.contract", "be_rallyhubv2.contract\be_rallyhubv2.contract.csproj", "{6222D25C-6BF0-4A70-9831-1ACC8910BE6E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "be_rallyhubv2.domain", "be_rallyhubv2.domain\be_rallyhubv2.domain.csproj", "{6A8563CD-96EB-441F-944D-2CBA606BDC81}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "be_rallyhubv2.tests.unit", "be_rallyhubv2.tests.unit\be_rallyhubv2.tests.unit.csproj", "{6E0C16A7-2558-425A-ABBA-C1BF04960018}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -48,5 +51,9 @@ Global
 		{6A8563CD-96EB-441F-944D-2CBA606BDC81}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6A8563CD-96EB-441F-944D-2CBA606BDC81}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6A8563CD-96EB-441F-944D-2CBA606BDC81}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E0C16A7-2558-425A-ABBA-C1BF04960018}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E0C16A7-2558-425A-ABBA-C1BF04960018}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E0C16A7-2558-425A-ABBA-C1BF04960018}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E0C16A7-2558-425A-ABBA-C1BF04960018}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
