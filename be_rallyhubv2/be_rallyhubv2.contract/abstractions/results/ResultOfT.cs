@@ -1,10 +1,15 @@
-﻿namespace be_rallyhubv2.contract.abstractions.results;
+﻿using System.Text.Json.Serialization;
+
+namespace be_rallyhubv2.contract.abstractions.results;
 
 public sealed class Result<T>: Result
 {
     private readonly T? _value;
     
-    private Result(T? value, bool isSuccess, Error[] errors) : base(isSuccess, errors)
+    [JsonConstructor]
+    //kêu thằng jsonConstructor này dựng cái constructor private này thành object
+    //mình chỉ cache những kết quả thành công thôi, nên thường list errors sẽ empty
+    private Result(T? value, bool isSuccess, IReadOnlyList<Error> errors) : base(isSuccess, errors)
     {
         _value = value;
     }

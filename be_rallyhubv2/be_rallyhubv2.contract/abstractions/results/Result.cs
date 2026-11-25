@@ -3,14 +3,14 @@
 public class Result
 {
     //chỉ có lớp con mới được gọi constructor đó, code bên ngoài thì không
-    protected Result(bool isSuccess, Error[] errors)
+    protected Result(bool isSuccess, IReadOnlyList<Error> errors)
     {
-        if (isSuccess && errors.Length > 0)
+        if (isSuccess && errors.Count > 0)
         {
             throw new InvalidOperationException("A successful result cannot contain errors.");
         }
 
-        if (!isSuccess && errors.Length == 0)
+        if (!isSuccess && errors.Count == 0)
         {
             throw new InvalidOperationException("A failed result must contain at least one error.");
         }

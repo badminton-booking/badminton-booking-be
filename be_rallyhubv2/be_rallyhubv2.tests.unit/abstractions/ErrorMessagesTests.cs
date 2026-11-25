@@ -4,6 +4,8 @@ using System.Resources;
 using be_rallyhubv2.contract.abstractions.common;
 using be_rallyhubv2.contract.abstractions.results;
 using be_rallyhubv2.contract.resources;
+using be_rallyhubv2.application.behaviors; 
+
 
 namespace be_rallyhubv2.tests.unit.abstractions;
 
@@ -15,7 +17,8 @@ public class ErrorMessagesTests
         typeof(CommonErrors).GetFields(BindingFlags.Public | BindingFlags.Static)
             .Where(field => field.FieldType == typeof(Error))
             .Select(field => new object[] { ((Error)field.GetValue(null)!).Code })
-            .Append(new object[] { "Common.NotFound" });
+            .Append(new object[] { "Common.NotFound" })
+            .Concat(ConstraintErrorMap.Errors.Values.Select(x => new object[] { x.Code }));
     
     [Theory]
     [MemberData(nameof(AllCodes))]

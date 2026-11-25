@@ -13,4 +13,7 @@
     <data name="Common.Unexpected" xml:space="preserve"><value>Something went wrong. Please try again later.</value></data>
     <data name="Common.RateLimited" xml:space="preserve"><value>Too many requests. Please slow down.</value></data>
     <data name="Common.OriginNotAllowed" xml:space="preserve"><value>This origin is not allowed.</value></data>
+    <data name="Booking.SlotTaken" xml:space="preserve"><value>This time slot has just been booked by someone else.</value></data>
+    <data name="Booking.CampaignCodeAlreadyUsed" xml:space="preserve"><value>You have already used this voucher code.</value></data>
+    <data name="Identity.EmailTaken" xml:space="preserve"><value>This email is already registered.</value></data>
 </root>

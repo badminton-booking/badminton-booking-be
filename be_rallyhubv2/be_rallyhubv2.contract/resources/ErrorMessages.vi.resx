@@ -13,4 +13,7 @@
     <data name="Common.Unexpected" xml:space="preserve"><value>Đã có lỗi xảy ra. Vui lòng thử lại sau.</value></data>
     <data name="Common.RateLimited" xml:space="preserve"><value>Bạn thao tác quá nhanh. Vui lòng chậm lại.</value></data>
     <data name="Common.OriginNotAllowed" xml:space="preserve"><value>Nguồn gửi yêu cầu không được phép.</value></data>
-</root>
+    <data name="Booking.SlotTaken" xml:space="preserve"><value>Khung giờ này vừa có người khác đặt.</value></data>
+    <data name="Booking.CampaignCodeAlreadyUsed" xml:space="preserve"><value>Bạn đã sử dụng mã giảm giá này rồi.</value></data>
+    <data name="Identity.EmailTaken" xml:space="preserve"><value>Email này đã được đăng ký.</value></data>
+</root> 
