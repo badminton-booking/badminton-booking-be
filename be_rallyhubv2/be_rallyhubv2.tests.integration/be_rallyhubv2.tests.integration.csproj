@@ -14,6 +14,7 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageReference Include="Testcontainers.PostgreSql" Version="4.8.1" />
+    <PackageReference Include="Testcontainers.Redis" Version="4.8.1" />
     <PackageReference Include="xunit" Version="2.5.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
   </ItemGroup>
@@ -26,6 +27,7 @@
     <ProjectReference Include="..\be_rallyhubv2.persistence\be_rallyhubv2.persistence.csproj" />
     <ProjectReference Include="..\be_rallyhubv2.application\be_rallyhubv2.application.csproj" />
     <ProjectReference Include="..\be_rallyhubv2.domain\be_rallyhubv2.domain.csproj" />
+    <ProjectReference Include="..\be_rallyhubv2.infrastructure\be_rallyhubv2.infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

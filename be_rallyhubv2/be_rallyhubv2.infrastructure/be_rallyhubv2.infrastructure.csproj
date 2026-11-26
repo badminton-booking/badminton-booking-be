@@ -11,15 +11,19 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="authentication\" />
       <Folder Include="backgroundJobs\" />
-      <Folder Include="caching\" />
-      <Folder Include="dependencyInjection\" />
-      <Folder Include="files\" />
-      <Folder Include="mail\" />
       <Folder Include="maps\" />
-      <Folder Include="passwordHasher\" />
       <Folder Include="payments\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="CloudinaryDotNet" Version="1.28.0" />
+      <PackageReference Include="MailKit" Version="4.18.2" />
+      <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.11" />
+      <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.1" />
+      <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="8.0.0" />
+      <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.1.2" />
     </ItemGroup>
 
 </Project>
